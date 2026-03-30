@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "raptio-mcp"
+version = "0.1.0"
+description = "MCP Server for RAPT.io - Monitor and control KegLand fermentation chambers and RaptPill hydrometers"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "KegLand RAPT MCP" }]
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+raptio-mcp = "raptio_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raptio_mcp"]
