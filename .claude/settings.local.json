@@ -8,7 +8,25 @@
       "Bash(git add:*)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(git commit -m \"Initial commit: RAPT.io MCP Server:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(uv run:*)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(cmd /c \"uv run python -c \\\\\"print\\('hello'\\)\\\\\"\" 2>&1)",
+      "Bash(powershell -Command \"cd C:\\\\git\\\\raptio_mcp; uv run python -c 'print\\(\\\\\"hello\\\\\"\\)'\" 2>&1)",
+      "Bash(where uv:*)",
+      "Bash(uv --version)",
+      "Bash(powershell -Command \"Get-Command uv | Select-Object -ExpandProperty Source\")",
+      "WebSearch",
+      "WebFetch(domain:docs.rapt.io)",
+      "WebFetch(domain:www.problembar.net)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:app.rapt.io)",
+      "Bash(curl -s https://app.rapt.io)",
+      "Bash(curl -I https://app.rapt.io)",
+      "Bash(curl -s \"https://api.rapt.io/swagger/v1/swagger.json\")",
+      "Bash(git -C /c/git/raptio_mcp status)"
     ]
   }
 }
