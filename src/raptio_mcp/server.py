@@ -140,6 +140,106 @@ TOOLS: list[Tool] = [
         },
     ),
     Tool(
+        name="set_fermentation_chamber_heating_enabled",
+        description="Enable or disable the heating element of a fermentation chamber.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "enabled": {"type": "boolean", "description": "true to enable heating, false to disable"},
+            },
+            "required": ["chamber_id", "enabled"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_cooling_enabled",
+        description="Enable or disable the cooling (compressor) of a fermentation chamber.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "enabled": {"type": "boolean", "description": "true to enable cooling, false to disable"},
+            },
+            "required": ["chamber_id", "enabled"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_fan_enabled",
+        description="Enable or disable the fan of a fermentation chamber.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "enabled": {"type": "boolean", "description": "true to enable fan, false to disable"},
+            },
+            "required": ["chamber_id", "enabled"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_light_enabled",
+        description="Control the light of a fermentation chamber (On, Off, or Auto).",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "state": {
+                    "type": "string",
+                    "enum": ["On", "Off", "Auto"],
+                    "description": "Light state: On, Off, or Auto",
+                },
+            },
+            "required": ["chamber_id", "state"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_cooling_hysteresis",
+        description="Set the cooling hysteresis (deadband) for a fermentation chamber. Valid range: 0.5–10.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "value": {"type": "number", "description": "Cooling hysteresis value (0.5–10)"},
+            },
+            "required": ["chamber_id", "value"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_heating_hysteresis",
+        description="Set the heating hysteresis (deadband) for a fermentation chamber. Valid range: 0.1–10.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "value": {"type": "number", "description": "Heating hysteresis value (0.1–10)"},
+            },
+            "required": ["chamber_id", "value"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_compressor_delay",
+        description="Set the compressor restart delay in minutes for a fermentation chamber. Valid range: 2–10.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "minutes": {"type": "integer", "description": "Compressor delay in minutes (2–10)"},
+            },
+            "required": ["chamber_id", "minutes"],
+        },
+    ),
+    Tool(
+        name="set_fermentation_chamber_mode_switch_delay",
+        description="Set the heating/cooling mode switch delay in minutes for a fermentation chamber. Valid range: 2–30.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "chamber_id": {"type": "string", "description": "UUID of the fermentation chamber"},
+                "minutes": {"type": "integer", "description": "Mode switch delay in minutes (2–30)"},
+            },
+            "required": ["chamber_id", "minutes"],
+        },
+    ),
+    Tool(
         name="get_fermentation_chamber_telemetry",
         description=(
             "Get historical telemetry data for a fermentation chamber, including "
@@ -331,6 +431,54 @@ def create_server() -> tuple[Server, RaptClient]:
                     float(arguments["p"]),
                     float(arguments["i"]),
                     float(arguments["d"]),
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_heating_enabled":
+                result = await client.set_fermentation_chamber_heating_enabled(
+                    arguments["chamber_id"], bool(arguments["enabled"])
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_cooling_enabled":
+                result = await client.set_fermentation_chamber_cooling_enabled(
+                    arguments["chamber_id"], bool(arguments["enabled"])
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_fan_enabled":
+                result = await client.set_fermentation_chamber_fan_enabled(
+                    arguments["chamber_id"], bool(arguments["enabled"])
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_light_enabled":
+                result = await client.set_fermentation_chamber_light_enabled(
+                    arguments["chamber_id"], arguments["state"]
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_cooling_hysteresis":
+                result = await client.set_fermentation_chamber_cooling_hysteresis(
+                    arguments["chamber_id"], float(arguments["value"])
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_heating_hysteresis":
+                result = await client.set_fermentation_chamber_heating_hysteresis(
+                    arguments["chamber_id"], float(arguments["value"])
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_compressor_delay":
+                result = await client.set_fermentation_chamber_compressor_delay(
+                    arguments["chamber_id"], int(arguments["minutes"])
+                )
+                return _ok({"success": result})
+
+            if name == "set_fermentation_chamber_mode_switch_delay":
+                result = await client.set_fermentation_chamber_mode_switch_delay(
+                    arguments["chamber_id"], int(arguments["minutes"])
                 )
                 return _ok({"success": result})
 

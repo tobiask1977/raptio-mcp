@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 from typing import Any
 
 import httpx
@@ -43,7 +42,6 @@ class RaptClient:
                 "grant_type": "password",
                 "username": self._username,
                 "password": self._password,
-                "scope": "offline_access",
             },
         )
         if resp.status_code != 200:
@@ -76,6 +74,34 @@ class RaptClient:
         if resp.status_code != 200:
             raise RaptApiError(resp.status_code, resp.text)
         return resp.json()
+
+    async def _post_json(
+        self,
+        path: str,
+        data: Any,
+        params: dict[str, Any] | None = None,
+    ) -> Any:
+        await self._ensure_token()
+        resp = await self._http.post(
+            path,
+            json=data,
+            params=params,
+            headers={"Authorization": f"Bearer {self._access_token}"},
+        )
+        if resp.status_code != 200:
+            raise RaptApiError(resp.status_code, resp.text)
+        return resp.json()
+
+    async def _update_fermentation_chamber(
+        self, chamber_id: str, updates: dict[str, Any]
+    ) -> bool:
+        current = await self.get_fermentation_chamber(chamber_id)
+        current.update(updates)
+        return await self._post_json(
+            "/api/FermentationChambers/UpdateFermentationChamber",
+            current,
+            {"resetValidationCode": "false"},
+        )
 
     async def close(self) -> None:
         await self._http.aclose()
@@ -142,6 +168,62 @@ class RaptClient:
         return await self._post(
             "/api/FermentationChambers/SetPID",
             {"fermentationChamberId": chamber_id, "p": p, "i": i, "d": d},
+        )
+
+    async def set_fermentation_chamber_heating_enabled(
+        self, chamber_id: str, enabled: bool
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"heatingEnabled": enabled}
+        )
+
+    async def set_fermentation_chamber_cooling_enabled(
+        self, chamber_id: str, enabled: bool
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"coolingEnabled": enabled}
+        )
+
+    async def set_fermentation_chamber_fan_enabled(
+        self, chamber_id: str, enabled: bool
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"fanEnabled": enabled}
+        )
+
+    async def set_fermentation_chamber_light_enabled(
+        self, chamber_id: str, state: str
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"lightEnabled": state}
+        )
+
+    async def set_fermentation_chamber_cooling_hysteresis(
+        self, chamber_id: str, value: float
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"coolingHysteresis": value}
+        )
+
+    async def set_fermentation_chamber_heating_hysteresis(
+        self, chamber_id: str, value: float
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"heatingHysteresis": value}
+        )
+
+    async def set_fermentation_chamber_compressor_delay(
+        self, chamber_id: str, minutes: int
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"compressorDelay": minutes}
+        )
+
+    async def set_fermentation_chamber_mode_switch_delay(
+        self, chamber_id: str, minutes: int
+    ) -> bool:
+        return await self._update_fermentation_chamber(
+            chamber_id, {"modeSwitchDelay": minutes}
         )
 
     async def get_fermentation_chamber_telemetry(
